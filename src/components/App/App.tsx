@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useQuery } from '@tanstack/react-query'
 
-import type { FetchNotesResponse } from '../../services/noteService'
 import { fetchNotes } from '../../services/noteService'
+import type { FetchNotesResponse } from '../../services/noteService'
 
 import SearchBox from '../SearchBox/SearchBox'
 import Pagination from '../Pagination/Pagination'
@@ -19,22 +19,30 @@ export default function App() {
   const [debouncedSearch] = useDebounce(searchTerm, 500)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-const { data, isLoading, isError } = useQuery<FetchNotesResponse, Error>({
-  queryKey: ['notes', page, debouncedSearch],
-  queryFn: () =>
-    fetchNotes({
-      page,
-      perPage: 12,
-      search: debouncedSearch,
-    }),
-})
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch])
 
-  if (isLoading) {
-    return <p className={css.message}>Loading notes…</p>
-  }
-  if (isError) {
-    return <p className={css.message}>Error loading notes</p>
-  }
+  const { data, isLoading, isError } = useQuery<FetchNotesResponse>({
+    queryKey: ['notes', page, debouncedSearch],
+    queryFn: () =>
+      fetchNotes({
+        page,
+        perPage: 12,
+        search: debouncedSearch,
+      }),
+
+    placeholderData: (prevData) => {
+      if (!prevData) {
+        return {
+          notes: [],
+          totalPages: 0,
+          page: 1,
+        }
+      }
+      return prevData
+    },
+  })
 
   const notes = data?.notes ?? []
   const totalPages = data?.totalPages ?? 0
@@ -57,7 +65,11 @@ const { data, isLoading, isError } = useQuery<FetchNotesResponse, Error>({
         </button>
       </header>
 
-      {notes.length > 0 ? (
+      {isLoading ? (
+        <p className={css.message}>Loading…</p>
+      ) : isError ? (
+        <p className={css.message}>Error loading notes</p>
+      ) : notes.length > 0 ? (
         <NoteList notes={notes} />
       ) : (
         <p className={css.message}>No notes found</p>
