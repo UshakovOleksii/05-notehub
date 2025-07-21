@@ -16,11 +16,11 @@ interface FormValues {
 }
 
 const TAG_OPTIONS: NoteTag[] = [
-  'todo',
-  'work',
-  'personal',
-  'meeting',
-  'shopping',
+  'Todo',
+  'Work',
+  'Personal',
+  'Meeting',
+  'Shopping',
 ]
 
 const validationSchema = Yup.object({
@@ -28,7 +28,8 @@ const validationSchema = Yup.object({
     .min(3, 'Min 3 chars')
     .max(50, 'Max 50 chars')
     .required('Required'),
-  content: Yup.string().max(500, 'Max 500 chars'),
+  content: Yup.string()
+    .max(500, 'Max 500 chars'),
   tag: Yup.mixed<NoteTag>()
     .oneOf(TAG_OPTIONS, 'Select a valid tag')
     .required('Required'),
@@ -38,9 +39,9 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation<
-    Note,                                   // return type
-    Error,                                  // error type
-    Omit<Note, 'id' | 'createdAt' | 'updatedAt'> // variables type
+    Note,                                  
+    Error,                                 
+    Omit<Note, 'id' | 'createdAt' | 'updatedAt'> 
   >({
     mutationFn: createNote,
     onSuccess: () => {
@@ -52,7 +53,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   const initialValues: FormValues = {
     title: '',
     content: '',
-    tag: 'todo', // default must be one of NoteTag
+    tag: 'Todo', 
   }
 
   const handleSubmit = (
@@ -106,9 +107,9 @@ export default function NoteForm({ onClose }: NoteFormProps) {
               name="tag"
               className={css.select}
             >
-              {TAG_OPTIONS.map((t) => (
-                <option key={t} value={t}>
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
+              {TAG_OPTIONS.map((tagOption) => (
+                <option key={tagOption} value={tagOption}>
+                  {tagOption}
                 </option>
               ))}
             </Field>
