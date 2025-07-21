@@ -1,5 +1,3 @@
-// src/services/noteService.ts
-
 import axios from 'axios'
 import type { Note } from '../types/note'
 
@@ -46,8 +44,8 @@ export async function createNote(
 }
 
 export async function deleteNote(
-  id: string
-): Promise<{ id: string }> {
-  const { data } = await instance.delete<{ id: string }>(`/notes/${id}`)
+  id: number
+): Promise<{ id: number }> {
+  const { data } = await instance.delete<{ id: number }>(`/notes/${id}`)
   return data
 }
